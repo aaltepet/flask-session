@@ -483,7 +483,7 @@ class SqlAlchemySessionInterface(SessionInterface):
         if saved_session:
             try:
                 val = saved_session.data
-                data = self.serializer.loads(str(val))
+                data = self.serializer.loads(val)
                 return self.session_class(data, sid=sid)
             except:
                 return self.session_class(sid=sid)
