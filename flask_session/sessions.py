@@ -431,7 +431,7 @@ class SqlAlchemySessionInterface(SessionInterface):
     serializer = pickle
     session_class = SqlAlchemySession
 
-    def __init__(self, app, db, table, key_prefix, use_signer=False):
+    def __init__(self, app, db, table, bind_key, key_prefix, use_signer=False):
         if db is None:
             from flask.ext.sqlalchemy import SQLAlchemy
             db = SQLAlchemy(app)
@@ -441,6 +441,7 @@ class SqlAlchemySessionInterface(SessionInterface):
 
         class Session(self.db.Model):
             __tablename__ = table
+            __bind_key__ = bind_key
 
             id = self.db.Column(self.db.Integer, primary_key=True)
             session_id = self.db.Column(self.db.String(256), unique=True)
