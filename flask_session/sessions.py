@@ -18,6 +18,7 @@ except ImportError:
 
 from flask.sessions import SessionInterface as FlaskSessionInterface
 from flask.sessions import SessionMixin
+from flask import current_app
 from werkzeug.datastructures import CallbackDict
 from itsdangerous import Signer, BadSignature
 
@@ -445,7 +446,7 @@ class SqlAlchemySessionInterface(SessionInterface):
 
             id = self.db.Column(self.db.Integer, primary_key=True)
             session_id = self.db.Column(self.db.String(256), unique=True)
-            data = self.db.Column(self.db.Text)
+            data = self.db.Column(self.db.Binary)
             expiry = self.db.Column(self.db.DateTime)
 
             def __init__(self, session_id, data, expiry):
@@ -487,6 +488,8 @@ class SqlAlchemySessionInterface(SessionInterface):
                 data = self.serializer.loads(val)
                 return self.session_class(data, sid=sid)
             except:
+                current_app.logger.exception("Could not restore saved session %s from db",
+                                             sid)
                 return self.session_class(sid=sid)
         return self.session_class(sid=sid)
 
