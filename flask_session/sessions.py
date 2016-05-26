@@ -440,13 +440,16 @@ class SqlAlchemySessionInterface(SessionInterface):
         self.key_prefix = key_prefix
         self.use_signer = use_signer
 
+        if table in self.db.metadata.tables:
+            self.db.metadata.remove(self.db.metadata.tables[table])
+
         class Session(self.db.Model):
             __tablename__ = table
             __bind_key__ = bind_key
 
             id = self.db.Column(self.db.Integer, primary_key=True)
             session_id = self.db.Column(self.db.String(256), unique=True)
-            data = self.db.Column(self.db.Binary)
+            data = self.db.Column(self.db.Binary(10485760))
             expiry = self.db.Column(self.db.DateTime)
 
             def __init__(self, session_id, data, expiry):
